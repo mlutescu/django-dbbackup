@@ -1,6 +1,7 @@
 """
 Utils for handle files.
 """
+
 import logging
 
 from django.core.exceptions import ImproperlyConfigured
@@ -31,6 +32,24 @@ def get_storage(path=None, options=None):
             "You must specify a storage class using " "DBBACKUP_STORAGE settings."
         )
     return Storage(path, **options)
+
+
+def get_media_storage():
+    """
+    Get the configured media storage.
+
+    :return: Media storage
+    :rtype: :class:`django.core.files.storage.Storage`
+    """
+    try:
+        from django.core.files.storage import get_storage_class
+
+        return get_storage_class()()
+    except Exception:
+        from django.core.files.storage import storages
+        from django.db import DEFAULT_DB_ALIAS
+
+        return storages[DEFAULT_DB_ALIAS]
 
 
 class StorageError(Exception):
